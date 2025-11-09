@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Notas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e0e7ff;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input.error {
+            border-color: #ff4757;
+            animation: shake 0.5s;
+        }
+
+        input.success {
+            border-color: #26de81;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+
+        .dni-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .dni-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .check-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #26de81;
+            display: none;
+        }
+
+        .check-icon.show {
+            display: block;
+            animation: checkAppear 0.3s ease;
+        }
+
+        @keyframes checkAppear {
+            from { transform: translateY(-50%) scale(0); }
+            to { transform: translateY(-50%) scale(1); }
+        }
+
+        .btn-mostrar {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 28px;
+        }
+
+        .btn-mostrar:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .mensaje-error {
+            color: #ff4757;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .mensaje-error.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .datos-alumno {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 2px solid #26de81;
+            display: none;
+        }
+
+        .datos-alumno.show {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .datos-alumno p {
+            margin: 8px 0;
+            color: #4a5568;
+            font-size: 15px;
+        }
+
+        .datos-alumno strong {
+            color: #667eea;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-calcular {
+            flex: 2;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-calcular:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .resultado {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 25px;
+            border: 3px solid #e0e7ff;
+            display: none;
+        }
+
+        .resultado.show {
+            display: block;
+            animation: zoomIn 0.5s ease;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .resultado.aprobado {
+            border-color: #26de81;
+            background: linear-gradient(135deg, #d4f8e8 0%, #e8fff5 100%);
+            animation: vibrate 0.5s, glow-green 2s infinite;
+        }
+
+        .resultado.desaprobado {
+            border-color: #ff4757;
+            background: linear-gradient(135deg, #ffe5e5 0%, #fff0f0 100%);
+            animation: vibrate 0.5s, glow-red 2s infinite;
+        }
+
+        @keyframes glow-green {
+            0%, 100% { box-shadow: 0 0 20px rgba(38, 222, 129, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(38, 222, 129, 0.6); }
+        }
+
+        @keyframes glow-red {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 71, 87, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 71, 87, 0.6); }
+        }
+
+        .promedio {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .resultado.aprobado .promedio {
+            color: #26de81;
+        }
+
+        .resultado.desaprobado .promedio {
+            color: #ff4757;
+        }
+
+        .estado {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .emoji {
+            font-size: 60px;
+            margin: 15px 0;
+        }
+
+        .advertencia {
+            background: #fff3cd;
+            border: 3px solid #ffc107;
+            color: #856404;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .advertencia.show {
+            display: block;
+            animation: vibrate 0.5s, pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .advertencia-icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Calculadora de Notas</h1>
+
+        <div class="section">
+            <div class="section-title">👤 Datos del Alumno</div>
+            <div class="dni-container">
+                <div class="dni-input-wrapper">
+                    <label for="dni">DNI:</label>
+                    <input type="text" id="dni" maxlength="8" placeholder="Ingrese DNI (8 dígitos)">
+                    <span class="check-icon" id="checkIcon">✓</span>
+                    <div class="mensaje-error" id="mensajeDNI"></div>
+                </div>
+                <button class="btn-mostrar" onclick="mostrarDatos()">Mostrar</button>
+            </div>
+            <div class="datos-alumno" id="datosAlumno"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📝 Registro de Notas</div>
+            <div class="input-group">
+                <label for="nota1">Nota 1:</label>
+                <input type="text" id="nota1" placeholder="Ingrese nota (0-20)">
+            </div>
+            <div class="input-group">
+                <label for="nota2">Nota 2:</label>
+                <input type="text" id="nota2" placeholder="Ingrese nota (0-20)">
+            </div>
+            <div class="input-group">
+                <label for="nota3">Nota 3:</label>
+                <input type="text" id="nota3" placeholder="Ingrese nota (0-20)">
+            </div>
+            <div class="input-group">
+                <label for="nota4">Nota 4:</label>
+                <input type="text" id="nota4" placeholder="Ingrese nota (0-20)">
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button class="btn-calcular" onclick="calcularPromedio()">Calcular Promedio</button>
+            <button class="btn-secondary" onclick="limpiarNotas()">Limpiar Notas</button>
+            <button class="btn-secondary" onclick="actualizarTodo()">Actualizar Todo</button>
+        </div>
+
+        <div class="advertencia" id="advertencia">
+            <span class="advertencia-icon">⚠️</span>
+            Por favor, llenar todos los campos
+        </div>
+
+        <div class="resultado" id="resultado"></div>
+    </div>
+
+    <script>
+        const estudiantes = {
+            '62689050': {
+                nombres: 'Ruth Abigail',
+                apellidos: 'Atoche Cordero',
+                edad: 19,
+                especialidad: 'Desarrollo de Sistemas'
+            },
+            '12345678': {
+                nombres: 'Josué',
+                apellidos: 'Alvarez Pérez',
+                edad: 19,
+                especialidad: 'Mecatrónica Automotriz'
+            },
+            '87654321': {
+                nombres: 'Ana Lucia',
+                apellidos: 'Rodríguez Aguilar',
+                edad: 17,
+                especialidad: 'Enfermería'
+            }
+        };
+
+        let dniValido = false;
+
+        function mostrarDatos() {
+            const dni = document.getElementById('dni').value;
+            const mensajeDNI = document.getElementById('mensajeDNI');
+            const datosAlumno = document.getElementById('datosAlumno');
+            const checkIcon = document.getElementById('checkIcon');
+            const dniInput = document.getElementById('dni');
+
+            mensajeDNI.classList.remove('show');
+            datosAlumno.classList.remove('show');
+            checkIcon.classList.remove('show');
+            dniInput.classList.remove('error', 'success');
+            dniValido = false;
+
+            if (dni.length < 8) {
+                mensajeDNI.textContent = '8 caracteres';
+                mensajeDNI.classList.add('show');
+                dniInput.classList.add('error');
+                if (navigator.vibrate) navigator.vibrate(200);
+                return;
+            }
+
+            if (dni.length > 8) {
+                mensajeDNI.textContent = '8 caracteres';
+                mensajeDNI.classList.add('show');
+                dniInput.classList.add('error');
+                if (navigator.vibrate) navigator.vibrate(200);
+                return;
+            }
+
+            if (!estudiantes[dni]) {
+                mensajeDNI.textContent = 'Este dato no se encontró en la búsqueda';
+                mensajeDNI.classList.add('show');
+                dniInput.classList.add('error');
+                if (navigator.vibrate) navigator.vibrate(200);
+                return;
+            }
+
+            const estudiante = estudiantes[dni];
+            datosAlumno.innerHTML = `
+                <p><strong>Nombres:</strong> ${estudiante.nombres}</p>
+                <p><strong>Apellidos:</strong> ${estudiante.apellidos}</p>
+                <p><strong>Edad:</strong> ${estudiante.edad} años</p>
+                <p><strong>Especialidad:</strong> ${estudiante.especialidad}</p>
+            `;
+            datosAlumno.classList.add('show');
+            checkIcon.classList.add('show');
+            dniInput.classList.add('success');
+            dniValido = true;
+            if (navigator.vibrate) navigator.vibrate(100);
+        }
+
+        function calcularPromedio() {
+            const advertencia = document.getElementById('advertencia');
+            const resultado = document.getElementById('resultado');
+            
+            advertencia.classList.remove('show');
+            resultado.classList.remove('show');
+
+            if (!dniValido) {
+                alert('⚠️ Por favor, ingrese un DNI válido antes de calcular las notas');
+                return;
+            }
+
+            const nota1 = document.getElementById('nota1').value.trim();
+            const nota2 = document.getElementById('nota2').value.trim();
+            const nota3 = document.getElementById('nota3').value.trim();
+            const nota4 = document.getElementById('nota4').value.trim();
+
+            const inputs = [
+                document.getElementById('nota1'),
+                document.getElementById('nota2'),
+                document.getElementById('nota3'),
+                document.getElementById('nota4')
+            ];
+
+            let camposVacios = false;
+            inputs.forEach((input, index) => {
+                const valor = [nota1, nota2, nota3, nota4][index];
+                if (valor === '') {
+                    input.classList.add('error');
+                    camposVacios = true;
+                } else {
+                    input.classList.remove('error');
+                }
+            });
+
+            if (camposVacios) {
+                advertencia.classList.add('show');
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                return;
+            }
+
+            const n1 = parseFloat(nota1);
+            const n2 = parseFloat(nota2);
+            const n3 = parseFloat(nota3);
+            const n4 = parseFloat(nota4);
+
+            if (isNaN(n1) || isNaN(n2) || isNaN(n3) || isNaN(n4)) {
+                alert('⚠️ Error: Solo se permiten números. Por favor, ingrese valores numéricos válidos.');
+                return;
+            }
+
+            if (n1 < 0 || n1 > 20 || n2 < 0 || n2 > 20 || n3 < 0 || n3 > 20 || n4 < 0 || n4 > 20) {
+                alert('⚠️ Error: Las notas deben estar entre 0 y 20');
+                return;
+            }
+
+            const promedio = (n1 + n2 + n3 + n4) / 4;
+            const aprobado = promedio >= 13;
+
+            resultado.classList.remove('aprobado', 'desaprobado');
+            resultado.classList.add(aprobado ? 'aprobado' : 'desaprobado');
+
+            const emoji = aprobado ? '🎉' : '😢';
+            const estado = aprobado ? 'APROBADO' : 'DESAPROBADO';
+
+            resultado.innerHTML = `
+                <div class="emoji">${emoji}</div>
+                <div class="promedio">${promedio.toFixed(2)}</div>
+                <div class="estado">${estado}</div>
+            `;
+
+            resultado.classList.add('show');
+            if (navigator.vibrate) navigator.vibrate(aprobado ? 100 : 200);
+        }
+
+        function limpiarNotas() {
+            document.getElementById('nota1').value = '';
+            document.getElementById('nota2').value = '';
+            document.getElementById('nota3').value = '';
+            document.getElementById('nota4').value = '';
+            
+            const inputs = document.querySelectorAll('input[id^="nota"]');
+            inputs.forEach(input => input.classList.remove('error', 'success'));
+            
+            document.getElementById('resultado').classList.remove('show');
+            document.getElementById('advertencia').classList.remove('show');
+        }
+
+        function actualizarTodo() {
+            limpiarNotas();
+            document.getElementById('dni').value = '';
+            document.getElementById('dni').classList.remove('error', 'success');
+            document.getElementById('mensajeDNI').classList.remove('show');
+            document.getElementById('datosAlumno').classList.remove('show');
+            document.getElementById('checkIcon').classList.remove('show');
+            dniValido = false;
+        }
+    </script>
+</body>
+</html>
